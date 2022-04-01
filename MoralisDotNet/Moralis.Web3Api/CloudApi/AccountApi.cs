@@ -28,14 +28,15 @@
 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 * SOFTWARE.
 */ 
-            using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using RestSharp;
+//using RestSharp;
 using Newtonsoft.Json;
 using Moralis.Web3Api.Client;
 using Moralis.Web3Api.Interfaces;
 using Moralis.Web3Api.Models;
+using System.Net.Http;
 
 namespace Moralis.Web3Api.CloudApi
 {
@@ -128,7 +129,7 @@ namespace Moralis.Web3Api.CloudApi
 			var queryParams = new Dictionary<String, String>();
 			var headerParams = new Dictionary<String, String>();
 			var formParams = new Dictionary<String, String>();
-			var fileParams = new Dictionary<String, FileParameter>();
+			var fileParams = new Dictionary<String, object>();
 
 			var path = "/functions/getTransactions";
 			if (address != null) postBody.Add("address", ApiClient.ParameterToString(address));
@@ -146,14 +147,15 @@ namespace Moralis.Web3Api.CloudApi
 
 			string bodyData = postBody.Count > 0 ? JsonConvert.SerializeObject(postBody) : null;
 
-			IRestResponse response = (IRestResponse)(await ApiClient.CallApi(path, Method.POST, queryParams, bodyData, headerParams, formParams, fileParams, authSettings));
+			//IRestResponse response = (IRestResponse)(await ApiClient.CallApi(path, Method.POST, queryParams, bodyData, headerParams, formParams, fileParams, authSettings));
+			HttpResponseMessage response = await ApiClient.CallApi(path, HttpMethod.Post, bodyData, headerParams, queryParams, authSettings);
 
 			if (((int)response.StatusCode) >= 400)
 				throw new ApiException((int)response.StatusCode, "Error calling GetTransactions: " + response.Content, response.Content);
 			else if (((int)response.StatusCode) == 0)
-				throw new ApiException((int)response.StatusCode, "Error calling GetTransactions: " + response.ErrorMessage, response.ErrorMessage);
+				throw new ApiException((int)response.StatusCode, "Error calling GetTransactions: " + response.ReasonPhrase, response.ReasonPhrase);
 
-			return ((CloudFunctionResult<TransactionCollection>)ApiClient.Deserialize(response.Content, typeof(CloudFunctionResult<TransactionCollection>), response.Headers)).Result;
+			return ((CloudFunctionResult<TransactionCollection>)(await ApiClient.Deserialize(response.Content, typeof(CloudFunctionResult<TransactionCollection>), response.Headers))).Result;
 		}
 		/// <summary>
 		/// Gets native balance for a specific address
@@ -173,7 +175,7 @@ namespace Moralis.Web3Api.CloudApi
 			var queryParams = new Dictionary<String, String>();
 			var headerParams = new Dictionary<String, String>();
 			var formParams = new Dictionary<String, String>();
-			var fileParams = new Dictionary<String, FileParameter>();
+			var fileParams = new Dictionary<String, object>();
 
 			var path = "/functions/getNativeBalance";
 			if (address != null) postBody.Add("address", ApiClient.ParameterToString(address));
@@ -186,16 +188,18 @@ namespace Moralis.Web3Api.CloudApi
 
 			string bodyData = postBody.Count > 0 ? JsonConvert.SerializeObject(postBody) : null;
 
-			object resp = await ApiClient.CallApi(path, Method.POST, queryParams, bodyData, headerParams, formParams, fileParams, authSettings);
-			IRestResponse response = (IRestResponse)resp;
+			//object resp = await ApiClient.CallApi(path, Method.POST, queryParams, bodyData, headerParams, formParams, fileParams, authSettings);
+			//IRestResponse response = (IRestResponse)resp;
+			HttpResponseMessage response = await ApiClient.CallApi(path, HttpMethod.Post, bodyData, headerParams, queryParams, authSettings);
 
 			if (((int)response.StatusCode) >= 400)
 				throw new ApiException((int)response.StatusCode, "Error calling GetNativeBalance: " + response.Content, response.Content);
 			else if (((int)response.StatusCode) == 0)
-				throw new ApiException((int)response.StatusCode, "Error calling GetNativeBalance: " + response.ErrorMessage, response.ErrorMessage);
+				throw new ApiException((int)response.StatusCode, "Error calling GetNativeBalance: " + response.ReasonPhrase, response.ReasonPhrase);
 
-			return ((CloudFunctionResult<NativeBalance>)ApiClient.Deserialize(response.Content, typeof(CloudFunctionResult<NativeBalance>), response.Headers)).Result;
+			return ((CloudFunctionResult<NativeBalance>)(await ApiClient.Deserialize(response.Content, typeof(CloudFunctionResult<NativeBalance>), response.Headers))).Result;
 		}
+
 		/// <summary>
 		/// Gets token balances for a specific address
 		/// </summary>
@@ -215,7 +219,7 @@ namespace Moralis.Web3Api.CloudApi
 			var queryParams = new Dictionary<String, String>();
 			var headerParams = new Dictionary<String, String>();
 			var formParams = new Dictionary<String, String>();
-			var fileParams = new Dictionary<String, FileParameter>();
+			var fileParams = new Dictionary<String, object>();
 
 			var path = "/functions/getTokenBalances";
 			if (address != null) postBody.Add("address", ApiClient.ParameterToString(address));
@@ -229,14 +233,15 @@ namespace Moralis.Web3Api.CloudApi
 
 			string bodyData = postBody.Count > 0 ? JsonConvert.SerializeObject(postBody) : null;
 
-			IRestResponse response = (IRestResponse)(await ApiClient.CallApi(path, Method.POST, queryParams, bodyData, headerParams, formParams, fileParams, authSettings));
+			//IRestResponse response = (IRestResponse)(await ApiClient.CallApi(path, Method.POST, queryParams, bodyData, headerParams, formParams, fileParams, authSettings));
+			HttpResponseMessage response = await ApiClient.CallApi(path, HttpMethod.Post, bodyData, headerParams, queryParams, authSettings);
 
 			if (((int)response.StatusCode) >= 400)
 				throw new ApiException((int)response.StatusCode, "Error calling GetTokenBalances: " + response.Content, response.Content);
 			else if (((int)response.StatusCode) == 0)
-				throw new ApiException((int)response.StatusCode, "Error calling GetTokenBalances: " + response.ErrorMessage, response.ErrorMessage);
+				throw new ApiException((int)response.StatusCode, "Error calling GetTokenBalances: " + response.ReasonPhrase, response.ReasonPhrase);
 
-			return ((CloudFunctionResult<List<Erc20TokenBalance>>)ApiClient.Deserialize(response.Content, typeof(CloudFunctionResult<List<Erc20TokenBalance>>), response.Headers)).Result;
+			return ((CloudFunctionResult<List<Erc20TokenBalance>>)(await ApiClient.Deserialize(response.Content, typeof(CloudFunctionResult<List<Erc20TokenBalance>>), response.Headers))).Result;
 		}
 		/// <summary>
 		/// Gets ERC20 token transactions in descending order based on block number
@@ -273,7 +278,7 @@ namespace Moralis.Web3Api.CloudApi
 			var queryParams = new Dictionary<String, String>();
 			var headerParams = new Dictionary<String, String>();
 			var formParams = new Dictionary<String, String>();
-			var fileParams = new Dictionary<String, FileParameter>();
+			var fileParams = new Dictionary<String, object>();
 
 			var path = "/functions/getTokenTransfers";
 			if (address != null) postBody.Add("address", ApiClient.ParameterToString(address));
@@ -291,14 +296,15 @@ namespace Moralis.Web3Api.CloudApi
 
 			string bodyData = postBody.Count > 0 ? JsonConvert.SerializeObject(postBody) : null;
 
-			IRestResponse response = (IRestResponse)(await ApiClient.CallApi(path, Method.POST, queryParams, bodyData, headerParams, formParams, fileParams, authSettings));
+			//IRestResponse response = (IRestResponse)(await ApiClient.CallApi(path, Method.POST, queryParams, bodyData, headerParams, formParams, fileParams, authSettings));
+			HttpResponseMessage response = await ApiClient.CallApi(path, HttpMethod.Post, bodyData, headerParams, queryParams, authSettings);
 
 			if (((int)response.StatusCode) >= 400)
 				throw new ApiException((int)response.StatusCode, "Error calling GetTokenTransfers: " + response.Content, response.Content);
 			else if (((int)response.StatusCode) == 0)
-				throw new ApiException((int)response.StatusCode, "Error calling GetTokenTransfers: " + response.ErrorMessage, response.ErrorMessage);
+				throw new ApiException((int)response.StatusCode, "Error calling GetTokenTransfers: " + response.ReasonPhrase, response.ReasonPhrase);
 
-			return ((CloudFunctionResult<Erc20TransactionCollection>)ApiClient.Deserialize(response.Content, typeof(CloudFunctionResult<Erc20TransactionCollection>), response.Headers)).Result;
+			return ((CloudFunctionResult<Erc20TransactionCollection>)(await ApiClient.Deserialize(response.Content, typeof(CloudFunctionResult<Erc20TransactionCollection>), response.Headers))).Result;
 		}
 		/// <summary>
 		/// Gets NFTs owned by the given address
@@ -325,7 +331,7 @@ namespace Moralis.Web3Api.CloudApi
 			var queryParams = new Dictionary<String, String>();
 			var headerParams = new Dictionary<String, String>();
 			var formParams = new Dictionary<String, String>();
-			var fileParams = new Dictionary<String, FileParameter>();
+			var fileParams = new Dictionary<String, object>();
 
 			var path = "/functions/getNFTs";
 			if (address != null) postBody.Add("address", ApiClient.ParameterToString(address));
@@ -340,14 +346,15 @@ namespace Moralis.Web3Api.CloudApi
 
 			string bodyData = postBody.Count > 0 ? JsonConvert.SerializeObject(postBody) : null;
 
-			IRestResponse response = (IRestResponse)(await ApiClient.CallApi(path, Method.POST, queryParams, bodyData, headerParams, formParams, fileParams, authSettings));
+			//IRestResponse response = (IRestResponse)(await ApiClient.CallApi(path, Method.POST, queryParams, bodyData, headerParams, formParams, fileParams, authSettings));
+			HttpResponseMessage response = await ApiClient.CallApi(path, HttpMethod.Post, bodyData, headerParams, queryParams, authSettings);
 
 			if (((int)response.StatusCode) >= 400)
 				throw new ApiException((int)response.StatusCode, "Error calling GetNFTs: " + response.Content, response.Content);
 			else if (((int)response.StatusCode) == 0)
-				throw new ApiException((int)response.StatusCode, "Error calling GetNFTs: " + response.ErrorMessage, response.ErrorMessage);
+				throw new ApiException((int)response.StatusCode, "Error calling GetNFTs: " + response.ReasonPhrase, response.ReasonPhrase);
 
-			return ((CloudFunctionResult<NftOwnerCollection>)ApiClient.Deserialize(response.Content, typeof(CloudFunctionResult<NftOwnerCollection>), response.Headers)).Result;
+			return ((CloudFunctionResult<NftOwnerCollection>)(await ApiClient.Deserialize(response.Content, typeof(CloudFunctionResult<NftOwnerCollection>), response.Headers))) .Result;
 		}
 		/// <summary>
 		/// Gets the transfers of the tokens matching the given parameters
@@ -371,7 +378,7 @@ namespace Moralis.Web3Api.CloudApi
 			var queryParams = new Dictionary<String, String>();
 			var headerParams = new Dictionary<String, String>();
 			var formParams = new Dictionary<String, String>();
-			var fileParams = new Dictionary<String, FileParameter>();
+			var fileParams = new Dictionary<String, object>();
 
 			var path = "/functions/getNFTTransfers";
 			if (address != null) postBody.Add("address", ApiClient.ParameterToString(address));
@@ -387,14 +394,15 @@ namespace Moralis.Web3Api.CloudApi
 
 			string bodyData = postBody.Count > 0 ? JsonConvert.SerializeObject(postBody) : null;
 
-			IRestResponse response = (IRestResponse)(await ApiClient.CallApi(path, Method.POST, queryParams, bodyData, headerParams, formParams, fileParams, authSettings));
+			//IRestResponse response = (IRestResponse)(await ApiClient.CallApi(path, Method.POST, queryParams, bodyData, headerParams, formParams, fileParams, authSettings));
+			HttpResponseMessage response = await ApiClient.CallApi(path, HttpMethod.Post, bodyData, headerParams, queryParams, authSettings);
 
 			if (((int)response.StatusCode) >= 400)
 				throw new ApiException((int)response.StatusCode, "Error calling GetNFTTransfers: " + response.Content, response.Content);
 			else if (((int)response.StatusCode) == 0)
-				throw new ApiException((int)response.StatusCode, "Error calling GetNFTTransfers: " + response.ErrorMessage, response.ErrorMessage);
+				throw new ApiException((int)response.StatusCode, "Error calling GetNFTTransfers: " + response.ReasonPhrase, response.ReasonPhrase);
 
-			return ((CloudFunctionResult<NftTransferCollection>)ApiClient.Deserialize(response.Content, typeof(CloudFunctionResult<NftTransferCollection>), response.Headers)).Result;
+			return ((CloudFunctionResult<NftTransferCollection>)(await ApiClient.Deserialize(response.Content, typeof(CloudFunctionResult<NftTransferCollection>), response.Headers))).Result;
 		}
 		/// <summary>
 		/// Gets NFTs owned by the given address
@@ -423,7 +431,7 @@ namespace Moralis.Web3Api.CloudApi
 			var queryParams = new Dictionary<String, String>();
 			var headerParams = new Dictionary<String, String>();
 			var formParams = new Dictionary<String, String>();
-			var fileParams = new Dictionary<String, FileParameter>();
+			var fileParams = new Dictionary<String, object>();
 
 			var path = "/functions/getNFTsForContract";
 			if (address != null) postBody.Add("address", ApiClient.ParameterToString(address));
@@ -438,14 +446,15 @@ namespace Moralis.Web3Api.CloudApi
 
 			string bodyData = postBody.Count > 0 ? JsonConvert.SerializeObject(postBody) : null;
 
-			IRestResponse response = (IRestResponse)(await ApiClient.CallApi(path, Method.POST, queryParams, bodyData, headerParams, formParams, fileParams, authSettings));
+			//IRestResponse response = (IRestResponse)(await ApiClient.CallApi(path, Method.POST, queryParams, bodyData, headerParams, formParams, fileParams, authSettings));
+			HttpResponseMessage response = await ApiClient.CallApi(path, HttpMethod.Post, bodyData, headerParams, queryParams, authSettings);
 
 			if (((int)response.StatusCode) >= 400)
 				throw new ApiException((int)response.StatusCode, "Error calling GetNFTsForContract: " + response.Content, response.Content);
 			else if (((int)response.StatusCode) == 0)
-				throw new ApiException((int)response.StatusCode, "Error calling GetNFTsForContract: " + response.ErrorMessage, response.ErrorMessage);
+				throw new ApiException((int)response.StatusCode, "Error calling GetNFTsForContract: " + response.ReasonPhrase, response.ReasonPhrase);
 
-			return ((CloudFunctionResult<NftOwnerCollection>)ApiClient.Deserialize(response.Content, typeof(CloudFunctionResult<NftOwnerCollection>), response.Headers)).Result;
+			return ((CloudFunctionResult<NftOwnerCollection>)(await ApiClient.Deserialize(response.Content, typeof(CloudFunctionResult<NftOwnerCollection>), response.Headers))).Result;
 		}
 	}
 }

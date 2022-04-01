@@ -28,14 +28,15 @@
 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 * SOFTWARE.
 */ 
-            using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using RestSharp;
+//using RestSharp;
 using Newtonsoft.Json;
 using Moralis.Web3Api.Client;
 using Moralis.Web3Api.Interfaces;
 using Moralis.Web3Api.Models;
+using System.Net.Http;
 
 namespace Moralis.Web3Api.CloudApi
 {
@@ -115,7 +116,7 @@ namespace Moralis.Web3Api.CloudApi
 			var queryParams = new Dictionary<String, String>();
 			var headerParams = new Dictionary<String, String>();
 			var formParams = new Dictionary<String, String>();
-			var fileParams = new Dictionary<String, FileParameter>();
+			var fileParams = new Dictionary<String, object>();
 
 			var path = "/functions/getPairReserves";
 			if (pairAddress != null) postBody.Add("pair_address", ApiClient.ParameterToString(pairAddress));
@@ -129,14 +130,15 @@ namespace Moralis.Web3Api.CloudApi
 
 			string bodyData = postBody.Count > 0 ? JsonConvert.SerializeObject(postBody) : null;
 
-			IRestResponse response = (IRestResponse)(await ApiClient.CallApi(path, Method.POST, queryParams, bodyData, headerParams, formParams, fileParams, authSettings));
+			//IRestResponse response = (IRestResponse)(await ApiClient.CallApi(path, Method.POST, queryParams, bodyData, headerParams, formParams, fileParams, authSettings));
+			HttpResponseMessage response = await ApiClient.CallApi(path, HttpMethod.Post, bodyData, headerParams, queryParams, authSettings);
 
 			if (((int)response.StatusCode) >= 400)
 				throw new ApiException((int)response.StatusCode, "Error calling GetPairReserves: " + response.Content, response.Content);
 			else if (((int)response.StatusCode) == 0)
-				throw new ApiException((int)response.StatusCode, "Error calling GetPairReserves: " + response.ErrorMessage, response.ErrorMessage);
+				throw new ApiException((int)response.StatusCode, "Error calling GetPairReserves: " + response.ReasonPhrase, response.ReasonPhrase);
 
-			return ((CloudFunctionResult<ReservesCollection>)ApiClient.Deserialize(response.Content, typeof(CloudFunctionResult<ReservesCollection>), response.Headers)).Result;
+			return ((CloudFunctionResult<ReservesCollection>)(await ApiClient.Deserialize(response.Content, typeof(CloudFunctionResult<ReservesCollection>), response.Headers))).Result;
 		}
 		/// <summary>
 		/// Fetches and returns pair data of the provided token0+token1 combination.
@@ -169,7 +171,7 @@ namespace Moralis.Web3Api.CloudApi
 			var queryParams = new Dictionary<String, String>();
 			var headerParams = new Dictionary<String, String>();
 			var formParams = new Dictionary<String, String>();
-			var fileParams = new Dictionary<String, FileParameter>();
+			var fileParams = new Dictionary<String, object>();
 
 			var path = "/functions/getPairAddress";
 			if (exchange != null) postBody.Add("exchange", ApiClient.ParameterToString(exchange));
@@ -184,14 +186,15 @@ namespace Moralis.Web3Api.CloudApi
 
 			string bodyData = postBody.Count > 0 ? JsonConvert.SerializeObject(postBody) : null;
 
-			IRestResponse response = (IRestResponse)(await ApiClient.CallApi(path, Method.POST, queryParams, bodyData, headerParams, formParams, fileParams, authSettings));
+			//IRestResponse response = (IRestResponse)(await ApiClient.CallApi(path, Method.POST, queryParams, bodyData, headerParams, formParams, fileParams, authSettings));
+			HttpResponseMessage response = await ApiClient.CallApi(path, HttpMethod.Post, bodyData, headerParams, queryParams, authSettings);
 
 			if (((int)response.StatusCode) >= 400)
 				throw new ApiException((int)response.StatusCode, "Error calling GetPairAddress: " + response.Content, response.Content);
 			else if (((int)response.StatusCode) == 0)
-				throw new ApiException((int)response.StatusCode, "Error calling GetPairAddress: " + response.ErrorMessage, response.ErrorMessage);
+				throw new ApiException((int)response.StatusCode, "Error calling GetPairAddress: " + response.ReasonPhrase, response.ReasonPhrase);
 
-			return ((CloudFunctionResult<ReservesCollection>)ApiClient.Deserialize(response.Content, typeof(CloudFunctionResult<ReservesCollection>), response.Headers)).Result;
+			return ((CloudFunctionResult<ReservesCollection>)(await ApiClient.Deserialize(response.Content, typeof(CloudFunctionResult<ReservesCollection>), response.Headers))).Result;
 		}
 	}
 }
